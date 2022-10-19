@@ -4,8 +4,14 @@ A GUI for ctf-usb-keyboard-parser https://github.com/TeamRocketIst/ctf-usb-keybo
 It launches a GUI that allows you to browse in time the sequence of keyboard input.
 
 ### Usage
+
+Arguments can be passed to the command line as shown in the following example:
+
+- -f <path to the file> (instruction to generate the file required from the pcap in the following section) [mandatory]
+- -o <path to output file> where to save a sequential history of the keys pressed [optional]
+
 ```bash
-$ python usbkeyboard.py <file>
+$ python usbkeyboard.py -f <file> -o <output file>
 ```
 
 ### Extract file from pcap (might not work for every pcap)
