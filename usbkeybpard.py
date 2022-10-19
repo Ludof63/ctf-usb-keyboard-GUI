@@ -1,6 +1,5 @@
 import sys
-from tkinter import Tk, Label, Text, Button, Scale, HORIZONTAL
-
+import tkinter as tk
 
 NOTHING = '[NOTHING]'
 
@@ -110,10 +109,10 @@ class MyWindow:
         self.stack = []
 
         #first row: labels
-        self.i_number = Label(win, text=f'Number:   {self.instruction_number}')
+        self.i_number = tk.Label(win, text=f'Number:   {self.instruction_number}')
         self.i_number.grid(row=0, column=0)
 
-        self.key = Label(win, text=f'Key:  {self.data[self.instruction_number]}')
+        self.key = tk.Label(win, text=f'Key:  {self.data[self.instruction_number]}')
         self.key.grid(row=0, column=1)
         
         #second row: textbox
@@ -122,14 +121,14 @@ class MyWindow:
         self.stack.append('')
 
         #third row: slider
-        self.slider = Scale(win, from_=0, to=len(self.data)-1, orient=HORIZONTAL, command=self.slider_callback)
+        self.slider = tk.Scale(win, from_=0, to=len(self.data)-1, orient=tk.HORIZONTAL, command=self.slider_callback)
         self.slider.grid(row=2, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="nsew")
 
         #fourth row: buttons
-        self.prev = Button(win, text="Previous", command=self.press_prev)
+        self.prev = tk.Button(win, text="Previous", command=self.press_prev)
         self.prev.grid(row=3, column=0, padx=20, pady=20, sticky="ew")
 
-        self.next = Button(win, text="Next", command=self.press_next)
+        self.next = tk.Button(win, text="Next", command=self.press_next)
         self.next.grid(row=3, column=1, padx=20, pady=20, sticky="ew")
     
 
@@ -229,7 +228,7 @@ def main():
         print('Missing file to read...')
         exit(-1)
 
-    window=Tk()
+    window=tk.Tk()
     MyWindow(window,parse_keyboard(sys.argv[1]))
     window.mainloop()
 
