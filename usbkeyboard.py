@@ -259,18 +259,27 @@ class MyWindow:
 
 
 def main():
-    #use argparse to parse the command line arguments and get the path of the file to open with -f and the path of the output file with -h, it can be empty
+    #parsing command line arguments
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('-f', '--file', type=str, help='path of the file to open')
     parser.add_argument('-o', '--output', type=str, help='path of the output file for the keys log')
     args = parser.parse_args()
 
-    #if the file path is not specified, open a file dialog to select the file
+
     if(args.file == None):
+        print("Error: file path not specified")
+        exit(1)
+    
+    history = parse_keyboard(args.file)
 
-
+    if(args.output != None):
+        with open(args.output, 'w') as f:
+            for i in range(0,len(history)):
+                f.write(f'{i} {history[i]}\n')
+    
+    #GUI
     window=tk.Tk()
-    MyWindow(window,parse_keyboard(sys.argv[1]))
+    MyWindow(window,history)
     window.mainloop()
 
 if __name__ == "__main__":
