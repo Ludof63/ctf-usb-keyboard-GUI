@@ -1,5 +1,7 @@
-# ctf-usb-keyboard-parser
+# ctf-usb-keyboard-gui
 A GUI for ctf-usb-keyboard-parser https://github.com/TeamRocketIst/ctf-usb-keyboard-parser
+
+It launches a GUI that allows you to browse in time the sequence of keyboard input.
 
 ### Usage
 ```bash
@@ -26,21 +28,6 @@ If this happens you can use sed to add them like this:
 $ tshark -r ./usb.pcap -Y 'usb.capdata && usb.data_len == 8' -T fields -e usb.capdata | sed 's/../:&/g2'
 00:00:24:00:00:00:00:00
 00:00:00:00:00:00:00:00
-...
-```
-
-### Extract file from bsnoop
-Packet description:
-```
-Bluetooth Attribute Protocol
-    Opcode: Handle Value Notification (0x1b)
-    Handle: 0x002c (Human Interface Device: Report)
-```
-
-```bash
-$ tshark -r ./example.bsnoop -Y 'btatt.opcode == 0x1b && btatt.handle == 0x002c && btatt.value != 00:00:00:00:00:00:00' -T fields -e btatt.value | sed 's/.*:00/00:&/'
-00:00:1c:00:00:00:00:00
-00:00:12:00:00:00:00:00
 ...
 ```
 
