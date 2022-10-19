@@ -1,8 +1,6 @@
 import argparse
-import sys
 import tkinter as tk
 
-NOTHING = '[NOTHING]'
 
 KEY_CODES = {
     0x04: ["a", "A"],
@@ -138,7 +136,7 @@ class MyWindow:
         #second row: textbox
         self.textbox = tk.Text(win,undo=True,autoseparators=True)
         self.textbox.grid(row=1, column=0, columnspan=2, padx=20, pady=(20, 0), sticky="nsew")
-        self.stack.append('')
+        self.stack.append((True,''))
 
         #third row: slider
         self.slider = tk.Scale(win, from_=0, to=len(self.data)-1, orient=tk.HORIZONTAL, command=self.slider_callback)
@@ -170,28 +168,35 @@ class MyWindow:
             self.key.configure(text=f'Key:  {self.data[self.instruction_number]}')  
         self.slider.set(self.instruction_number)
         
-        if not self.stack:
-            self.stack.append('')
-        elif(NOTHING == self.stack[-1]):
-            self.stack.pop()
-        elif(self.textbox.get("1.0", "end-1c") == self.stack[-1]):
-            self.stack.pop()
+
         
-        self.textbox.delete("1.0", "end-1c")
-        self.textbox.insert(1.0, self.stack.pop())
+        if(self.stack[-1][0] == True):
+            if(self.textbox.get("1.0", "end-1c") == self.stack[-1][1]):
+                self.stack.pop()
+            
+            self.textbox.delete("1.0", "end-1c")
+            self.textbox.insert("1.0", self.stack[-1][1])
+
+        self.stack.pop()
+        if not self.stack:
+            self.stack.append((True,''))
+
+        #print(self.stack)
+    
+
 
 
     def press_next(self) -> None:
+
         """"
         ### Function description:
         Function called when the user presses the next button, it updates the instruction number and the key pressed labels and the slider
         then it updates the textbox saving the current text in the stack and adding the new key pressed considering the CAPSLOCK status
         and all the special keys (backspace, enter, tab, capslock, space)        
         """
-        do_push = True
         if(self.instruction_number > len(self.data)):
             return
-
+        
         self.instruction_number += 1
         #LABELS
         self.i_number.configure(text=f'Number:   {self.instruction_number}')
@@ -203,37 +208,40 @@ class MyWindow:
         #SLIDER 
         self.slider.set(self.instruction_number)
 
+        normal_push = True
+
         #TEXTBOX
         if(self.data[self.instruction_number] == '[BACKSPACE]'):
             #delete last char before cursor
             self.textbox.delete("insert-1c")
+            
 
         elif(self.data[self.instruction_number] == '[CAPSLOCK]'):
             #set or unset capslock
             self.CAPSLOCK = not self.CAPSLOCK
-            do_push = False
+            normal_push = False
 
         elif(self.data[self.instruction_number] == '←'):
             #move cursor left
             self.textbox.mark_set("insert", "insert-1c")
-            do_push = False
+            normal_push = False
         
         elif(self.data[self.instruction_number] == '→'):
             #move cursor right
             self.textbox.mark_set("insert", "insert+1c")
-            do_push = False
+            normal_push = False
 
             
         elif(self.data[self.instruction_number] == '↑'):
             #move cursor up
             self.textbox.mark_set("insert", "insert-1l")
-            do_push = False
+            normal_push = False
 
 
         elif(self.data[self.instruction_number] == '↓'):
             #move cursor to the end of the line
             self.textbox.mark_set("insert", "end")
-            do_push = False
+            normal_push = False
 
         elif(self.CAPSLOCK):
             self.textbox.insert("insert", self.data[self.instruction_number].upper())
@@ -241,10 +249,9 @@ class MyWindow:
             self.textbox.insert("insert", self.data[self.instruction_number])
         
         self.textbox.focus_set()
-        if(do_push):
-            self.stack.append(self.textbox.get("1.0", "end-1c"))
-        else:
-            self.stack.append(f'{NOTHING}')
+        self.stack.append((normal_push, self.textbox.get("1.0", "end-1c")))
+
+        #print(self.stack)
 
     def slider_callback(self, value):
         """
