@@ -1,3 +1,4 @@
+import argparse
 import sys
 import tkinter as tk
 
@@ -63,6 +64,13 @@ KEY_CODES = {
 }
 
 def parse_keyboard(file : str) -> list[str]:
+    '''
+    ### Function arguments:
+    - file:  path to file to read
+
+    ### Function returns:
+    - list of strings rappresenting the history of the keyboard (in the form of key pressed)
+    '''
     with open(file, "r") as f:
         datas = f.read().split("\n")
     datas = [d.strip() for d in datas if d]
@@ -94,8 +102,20 @@ def parse_keyboard(file : str) -> list[str]:
 
 
 class MyWindow:
-    def __init__(self, win : Tk, data, instruction_number=0):
+    def __init__(self, win : tk.Tk, data : list[str], instruction_number : int =0):
+        """
+        ### Function parameters:
+        - win: tkinter window
+        - data: list of keys pressed
+        - instruction_number: index of the key pressed
 
+        ### Function description:
+        Constructor of the class MyWindow, generates a tkinter window with a 3x2 grid layout, it includes:
+        - two labels, one for the instruction number and one for the key pressed
+        - a text box, to display text composed and where the user can modify it
+        - a slider, to navigate through the instructions
+        - two buttons, one to go to the next instruction and one to go to the previous instruction
+        """
         #window config
         win.geometry("500x300")
         win.title("Keyboard")
@@ -116,7 +136,7 @@ class MyWindow:
         self.key.grid(row=0, column=1)
         
         #second row: textbox
-        self.textbox = Text(win,undo=True,autoseparators=True)
+        self.textbox = tk.Text(win,undo=True,autoseparators=True)
         self.textbox.grid(row=1, column=0, columnspan=2, padx=20, pady=(20, 0), sticky="nsew")
         self.stack.append('')
 
@@ -133,7 +153,12 @@ class MyWindow:
     
 
 
-    def press_prev(self):      
+    def press_prev(self) -> None:
+        """
+        ### Function description:
+        Function called when the user presses the previous button, it updates the instruction number and the key pressed labels and the slider
+        then it updates the textbox restoring the previous text saved in the stack
+        """      
         if self.instruction_number == 0:
             return
         
@@ -156,7 +181,13 @@ class MyWindow:
         self.textbox.insert(1.0, self.stack.pop())
 
 
-    def press_next(self):
+    def press_next(self) -> None:
+        """"
+        ### Function description:
+        Function called when the user presses the next button, it updates the instruction number and the key pressed labels and the slider
+        then it updates the textbox saving the current text in the stack and adding the new key pressed considering the CAPSLOCK status
+        and all the special keys (backspace, enter, tab, capslock, space)        
+        """
         do_push = True
         if(self.instruction_number > len(self.data)):
             return
@@ -216,6 +247,10 @@ class MyWindow:
             self.stack.append(f'{NOTHING}')
 
     def slider_callback(self, value):
+        """
+        ### Function description:
+        Function called when the user moves the slider, it uses press_next and press_prev function
+        """
         while(self.instruction_number != int(value)):
             if(self.instruction_number < int(value)):
                 self.press_next()
@@ -224,9 +259,15 @@ class MyWindow:
 
 
 def main():
-    if len(sys.argv) < 2:
-        print('Missing file to read...')
-        exit(-1)
+    #use argparse to parse the command line arguments and get the path of the file to open with -f and the path of the output file with -h, it can be empty
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('-f', '--file', type=str, help='path of the file to open')
+    parser.add_argument('-o', '--output', type=str, help='path of the output file for the keys log')
+    args = parser.parse_args()
+
+    #if the file path is not specified, open a file dialog to select the file
+    if(args.file == None):
+
 
     window=tk.Tk()
     MyWindow(window,parse_keyboard(sys.argv[1]))
